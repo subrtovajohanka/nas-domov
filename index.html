@@ -53,14 +53,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--gr
     <p id="loginSubtitle">Jeden seznam pro vás oba. Přihlásit se mohou jen schválené e-maily.</p>
     <form id="loginForm">
       <label for="loginEmail">Tvůj e-mail</label><input type="email" id="loginEmail" class="field" placeholder="jmeno@example.cz" required autocomplete="email">
-      <button class="btn primary" style="width:100%" id="sendLogin" type="submit">Poslat přihlašovací kód</button>
-    </form>
-    <form id="verifyForm" class="hidden">
-      <label for="loginCode">Šestimístný kód z e-mailu</label><input id="loginCode" class="field" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" minlength="6" maxlength="8">
-      <button class="btn primary" style="width:100%" type="submit">Přihlásit se kódem</button>
+      <label for="loginPassword">Heslo</label><input type="password" id="loginPassword" class="field" placeholder="Tvoje heslo" required autocomplete="current-password">
+      <button class="btn primary" style="width:100%" id="sendLogin" type="submit">Přihlásit se</button>
     </form>
     <div class="auth-alert hidden" id="loginError" role="alert"></div>
-    <div class="auth-note" id="authNote">Můžeš také kliknout na přihlašovací odkaz v e-mailu. Při prvním spuštění je potřeba nastavit Supabase podle návodu.</div>
+    <div class="auth-note" id="authNote">Žádné přihlašovací e-maily. Stačí vlastní heslo. Účty spravujete vy dva v Supabase.</div>
     <button class="btn tiny hidden" id="logoutGate" type="button">Odhlásit se</button>
   </div>
 </div>
@@ -69,10 +66,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--gr
   <div class="brand"><div class="brand-logo">⌂</div><div><div class="brand-title">Náš domov</div><div class="brand-sub">Plán vybavení</div></div></div>
   <div><div class="nav-title">Přehled</div><nav class="nav" id="overviewNav"></nav></div>
   <div><div class="nav-title">Místnosti</div><nav class="nav" id="roomNav"></nav><button class="small-btn" id="addRoomBtn">＋ Přidat místnost</button></div>
-  <div class="side-bottom"><div class="online-pill"><span></span> Online synchronizace</div><div id="signedEmail" style="overflow-wrap:anywhere"></div><button id="logoutBtn" type="button">Odhlásit se</button><button id="backupSidebar">↓ Stáhnout zálohu</button></div>
+  <div class="side-bottom"><div class="online-pill"><span></span> Online synchronizace</div><div id="signedEmail" style="overflow-wrap:anywhere"></div><button id="passwordSidebar" type="button">Nastavit / změnit heslo</button><button id="logoutBtn" type="button">Odhlásit se</button><button id="backupSidebar">↓ Stáhnout zálohu</button></div>
  </aside>
  <main class="main">
-  <div class="header"><div><div class="eyebrow">Rekonstrukce & vybavení domu</div><h1 id="pageTitle">Vybavujeme domov</h1><p class="subtitle" id="pageSubtitle">Všechno, co chceme pořídit, na jednom místě.</p></div><div class="action-bar"><button id="importBtn" class="btn">↑ Načíst zálohu</button><button id="exportBtn" class="btn">↓ Záloha JSON</button><button id="pdfBtn" class="btn">▤ PDF katalog</button><button id="addBtn" class="btn primary">＋ Přidat věc</button></div></div>
+  <div class="header"><div><div class="eyebrow">Rekonstrukce & vybavení domu</div><h1 id="pageTitle">Vybavujeme domov</h1><p class="subtitle" id="pageSubtitle">Všechno, co chceme pořídit, na jednom místě.</p></div><div class="action-bar"><button id="passwordHeader" class="btn">⚙ Heslo</button><button id="importBtn" class="btn">↑ Načíst zálohu</button><button id="exportBtn" class="btn">↓ Záloha JSON</button><button id="pdfBtn" class="btn">▤ PDF katalog</button><button id="addBtn" class="btn primary">＋ Přidat věc</button></div></div>
   <div id="appToast" class="app-toast hidden" role="status" aria-live="polite"></div>
   <section id="stats" class="stats"></section>
   <section id="content"></section>
@@ -92,6 +89,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--gr
   <div class="form-group"><label for="itemImageFile">Nebo nahrát obrázek / screenshot</label><input class="file-field" id="itemImageFile" type="file" accept="image/*"><div class="image-preview" id="imagePreview">Zatím bez obrázku</div><button type="button" id="clearImage" class="btn tiny">Odebrat obrázek</button></div>
   <div class="form-group"><label for="itemNotes">Poznámka</label><textarea class="field" id="itemNotes" placeholder="Rozměr, barva, alternativa, co ještě ověřit…"></textarea></div>
   <div id="formError" class="form-error hidden" role="alert" aria-live="assertive"></div><div class="modal-actions"><button type="button" id="deleteItem" class="btn warn hidden">Smazat položku</button><div style="display:flex;gap:8px;margin-left:auto"><button type="button" class="btn" id="cancelItem">Zrušit</button><button type="submit" class="btn primary">Uložit položku</button></div></div>
+ </form>
+</dialog>
+<dialog class="dialog" id="passwordDialog" aria-labelledby="passwordDialogTitle">
+ <div class="dialog-head"><h2 id="passwordDialogTitle">Nastavit / změnit heslo</h2><button class="close" type="button" id="passwordClose" aria-label="Zavřít">×</button></div>
+ <form id="passwordForm" class="form-body">
+  <p style="margin:0 0 16px;color:#617262">Heslo slouží k přihlášení do Náš domov. Pokud už jsi přihlášená/přihlášený odkazem z e-mailu, můžeš si ho nastavit tady.</p>
+  <div class="form-group"><label for="newPassword">Nové heslo (alespoň 12 znaků)</label><input class="field" id="newPassword" type="password" autocomplete="new-password" minlength="12" required></div>
+  <div class="form-group"><label for="confirmPassword">Zopakovat heslo</label><input class="field" id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div>
+  <div id="passwordError" class="form-error hidden" role="alert"></div>
+  <div class="modal-actions"><button id="passwordCancel" class="btn" type="button">Zrušit</button><button id="passwordSave" class="btn primary" type="submit">Uložit heslo</button></div>
  </form>
 </dialog>
 <input type="file" id="jsonImport" accept=".json,application/json" hidden>
@@ -157,7 +164,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--gr
  }
  async function handleSession(session){
   const generation=++authGeneration;
-  if(!session?.user){currentUserId='';if(channel&&remote){remote.removeChannel(channel);channel=null}showGate();return}
+  if(!session?.user){$('#loginTitle').textContent='Přihlášení';currentUserId='';if(channel&&remote){remote.removeChannel(channel);channel=null}showGate();return}
   // Bezpečné načítání až po ověření identity ze Supabase.
   currentUserId=session.user.id;
   $('#signedEmail').textContent=session.user.email||'';
@@ -235,21 +242,44 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--gr
    e.preventDefault();clearAuthError();
    if(!remote)return authError('Nejdřív je nutné propojit Supabase.');
    const email=$('#loginEmail').value.trim().toLowerCase();
+   const password=$('#loginPassword').value;
+   if(!password)return authError('Zadej heslo.');
    $('#sendLogin').disabled=true;
    try{
-    const {error}=await remote.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:true}});
+    const {error}=await remote.auth.signInWithPassword({email,password});
     if(error)throw error;
-    $('#verifyForm').classList.remove('hidden');
-    $('#authNote').textContent='Zkontroluj e-mail. Použij doručený kód, případně klikni na přihlašovací odkaz. Pokud žádný nepřišel, zkontroluj spam.';
-    showToast('Kód byl odeslán na '+email);
-   }catch(err){authError('Přihlášení: '+err.message)}finally{$('#sendLogin').disabled=false}
+    $('#loginPassword').value='';
+   }catch(err){
+    if(/invalid login credentials|invalid credentials/i.test(err.message))authError('Nesprávný e-mail nebo heslo. Pokud jsi ještě heslo nenastavila/nenastavil, musí se nejprve vytvořit.');
+    else authError('Přihlášení: '+err.message);
+   }finally{$('#sendLogin').disabled=false}
   });
-  $('#verifyForm').addEventListener('submit',async e=>{
-   e.preventDefault();clearAuthError();
-   if(!remote)return authError('Databáze není připojena.');
-   const email=$('#loginEmail').value.trim().toLowerCase(),token=$('#loginCode').value.trim();
-   try{const {error}=await remote.auth.verifyOtp({email,token,type:'email'});if(error)throw error}
-   catch(err){authError('Ověření kódu: '+err.message)}
+  const openPassword=()=>{
+   $('#passwordError').classList.add('hidden');
+   $('#passwordForm').reset();
+   $('#passwordDialog').showModal();
+  };
+  $('#passwordHeader').addEventListener('click',openPassword);
+  $('#passwordSidebar').addEventListener('click',openPassword);
+  const closePassword=()=>$('#passwordDialog').close();
+  $('#passwordClose').addEventListener('click',closePassword);
+  $('#passwordCancel').addEventListener('click',closePassword);
+  $('#passwordForm').addEventListener('submit',async e=>{
+   e.preventDefault();
+   const pass=$('#newPassword').value,confirm=$('#confirmPassword').value;
+   const errorEl=$('#passwordError');
+   const errorMessage=message=>{errorEl.textContent=message;errorEl.classList.remove('hidden')};
+   errorEl.classList.add('hidden');
+   if(!currentUserId||!remote)return errorMessage('Nejdřív se přihlas.');
+   if(pass.length<12)return errorMessage('Heslo musí mít alespoň 12 znaků.');
+   if(pass!==confirm)return errorMessage('Hesla se neshodují.');
+   const saveBtn=$('#passwordSave');saveBtn.disabled=true;
+   try{
+    const {error}=await remote.auth.updateUser({password:pass});
+    if(error)throw error;
+    $('#passwordForm').reset();closePassword();showToast('✓ Heslo bylo nastaveno. Příště se můžeš přihlásit bez e-mailového odkazu.');
+   }catch(err){errorMessage('Heslo se nepodařilo uložit: '+err.message)}
+   finally{saveBtn.disabled=false}
   });
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&remote&&currentUserId&&!writesPending)loadRemote().catch(e=>showToast('⚠️ '+e.message,true))});
   $('#addBtn').addEventListener('click',()=>openForm());$('#closeDialog').addEventListener('click',closeForm);$('#cancelItem').addEventListener('click',closeForm);
